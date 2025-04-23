@@ -119,16 +119,22 @@ const UiVideo = () => {
           console.warn("Missing token!");
         }
         
-        const response = await axios.patch(
-          `http://localhost:3005/report/${report._id}`,
-          report,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              token,
-            },
-          }
-        );
+        const {
+          _id,
+          createdAt,
+          updatedAt,
+          __v,
+          plot,
+          ...rest      // send the rest of the report fields
+        } = report
+        await axios.patch(`http://localhost:3005/report/${report._id}`, rest, {
+          headers: {
+            'Content-Type': 'application/json',
+            token,
+          },
+          withCredentials: true, // only needed if backend sets cookies
+        });
+        
   
         // Success handling
         setIsEditing(false);

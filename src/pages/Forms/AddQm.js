@@ -118,6 +118,7 @@ const AddQm = () => {
                         placeholder="Enter ID..."
                         value={formData.id_by_organization}
                         onChange={handleChange}
+                        required
                       />
                     </div>
 
@@ -129,17 +130,22 @@ const AddQm = () => {
                         placeholder="Enter Name..."
                         value={formData.name}
                         onChange={handleChange}
+                        required
+                        minLength={3}
                       />
                     </div>
 
                     <div className="mb-3">
                       <Label className="form-label" htmlFor="phone">Phone:</Label>
                       <Input
-                        type="text"
+                        type="tel"
                         id="phone"
                         placeholder="Enter phone number..."
                         value={formData.phone}
                         onChange={handleChange}
+                        required
+                        minLength={11}
+                        maxLength={11}
                       />
                     </div>
 
@@ -151,6 +157,7 @@ const AddQm = () => {
                         placeholder="Enter Email..."
                         value={formData.email}
                         onChange={handleChange}
+                        required
                       />
                     </div>
 
@@ -162,6 +169,7 @@ const AddQm = () => {
                         placeholder="Enter Password..."
                         value={formData.password}
                         onChange={handleChange}
+                        required
                       />
                     </div>
 

@@ -82,10 +82,10 @@ const AddTutor = () => {
         toast.success(editMode ? "Tutor updated successfully!" : "Tutor added successfully!");
         navigate("/admin/tutor");
       } else {
-        toast.error("Error: " + response.data.message);
+        toast.error(response.data.message);
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error(error);
     }
   };
 
@@ -124,6 +124,7 @@ const AddTutor = () => {
                         value={formData.name}
                         onChange={handleChange}
                         required
+                        minLength={3}
                       />
                     </div>
 
@@ -135,17 +136,21 @@ const AddTutor = () => {
                         value={formData.national_id}
                         onChange={handleChange}
                         required
+                        minLength={14}
+                        maxLength={14}
                       />
                     </div>
 
                     <div className="mb-3">
                       <Label htmlFor="phone">Phone</Label>
                       <Input
-                        type="text"
+                        type="tel"
                         id="phone"
                         value={formData.phone}
                         onChange={handleChange}
                         required
+                        minLength={11}
+                        maxLength={11}
                       />
                     </div>
 

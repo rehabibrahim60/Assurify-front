@@ -20,6 +20,7 @@ import { useFormik } from "formik";
 
 import Breadcrumb from "../../components/Common/Breadcrumb";
 import avatar from "../../assets/images/users/user-4.jpg";
+import { toast } from "react-toastify";
 
 const UserProfile = () => {
   const [user, setUser] = useState({});
@@ -70,12 +71,14 @@ const UserProfile = () => {
           headers: { token }
         });
         setSuccess("User updated successfully");
+        toast.success("User updated successfully")
         setError("");
         console.log(res.data.user);
         
         setUser(res.data.user);
       } catch (err) {
         setError("Failed to update user.");
+        toast.error("Failed to update user.")
         setSuccess("");
         console.error(err);
       }
@@ -91,9 +94,6 @@ const UserProfile = () => {
 
         <Row>
           <Col lg="12">
-            {error && <Alert color="danger">{error}</Alert>}
-            {success && <Alert color="success">{success}</Alert>}
-
             <Card>
               <CardBody>
                 <div className="d-flex">
@@ -106,9 +106,9 @@ const UserProfile = () => {
                   </div>
                   <div className="align-self-center flex-1">
                     <div className="text-muted">
-                      <p><h5>Name: </h5>{user.name}</p>
-                      <p className="mb-1"><h5>Email: </h5>{user.email}</p>
-                      <p className="mb-0"><h5>ID: </h5>{user.id_by_organization}</p>
+                      <div><h5>Name: </h5>{user.name}</div>
+                      <div className="mb-1"><h5>Email: </h5>{user.email}</div>
+                      <div className="mb-0"><h5>ID: </h5>{user.id_by_organization}</div>
                     </div>
                   </div>
                 </div>
@@ -174,7 +174,7 @@ const UserProfile = () => {
               </div>
 
               <div className="form-group">
-                <Label className="form-label">ID by Organization</Label>
+                <Label className="form-label">ID </Label>
                 <Input
                   name="id_by_organization"
                   type="text"

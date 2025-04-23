@@ -5,6 +5,7 @@ import Breadcrumbs from "../../components/Common/Breadcrumb";
 import TableContainer from "../../components/Common/DataTableContainer";
 import { Input } from "reactstrap";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const AssignedSessions = () => {
   const navigate = useNavigate();
@@ -57,50 +58,40 @@ const AssignedSessions = () => {
   }, []);
 
   const handleStatusChange = (id, newStatus) => {
-    console.log(id, newStatus);
-
     const token = localStorage.getItem("token");
-
-    const updatedSession = sessionData.find((session) => session.id === id);
-    if (!updatedSession) return;
-
-    const updatedSessionData = {
-      title: updatedSession.title,
-      tutor_id: updatedSession.tutorId !== "N/A" ? updatedSession.tutorId : null,
-      assigned_to: typeof updatedSession.assignedTo === "string" ? updatedSession.assignedTo : null,
-      grade: updatedSession.grade,
-      lesson: updatedSession.lesson,
-      date: updatedSession.date !== "N/A" ? updatedSession.date : null,
-      pdf_id: typeof updatedSession.pdfLink === "string" ? updatedSession.pdfLink : null,
-      video: typeof updatedSession.videoLink === "string" ? updatedSession.videoLink : null,
-      status: newStatus,
-    };
-
-    console.log("Sending updated session data:", updatedSessionData);
-
+  
     setSessionData((prevData) =>
       prevData.map((session) =>
         session.id === id ? { ...session, status: newStatus } : session
       )
     );
-
+  
     axios
-      .patch(`http://localhost:3005/session/${id}`, updatedSessionData, {
-        headers: {
-          token,
-          "Content-Type": "application/json",
-        },
-      })
+      .patch(
+        `http://localhost:3005/session/${id}/status`,
+        { status: newStatus },
+        {
+          headers: {
+            token,
+            "Content-Type": "application/json",
+          },
+        }
+      )
       .then((res) => {
         if (res.data.success) {
-          console.log("Update successful:", res.data);
+          console.log("Status updated");
+          toast.success("status updated successfully")
         } else {
-          console.error("Error updating session:", res.data);
+          console.error("Failed to update status:", res.data);
+          toast.error("Failed to update status:", res.data);
         }
       })
-      .catch((err) => console.error("Axios update error:", err));
+      .catch((err) => {
+        console.error("Axios error while updating status:", err);
+        toast.error("Axios error while updating status:", err);
+      });
   };
-
+  
   const basePath = location.pathname.startsWith("/qm") ? "/qm" : "/admin";
 
   const columns = useMemo(

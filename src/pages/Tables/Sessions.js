@@ -14,6 +14,7 @@ const Sessions = () => {
   const [sessions, setSessions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState(null);
+  
 
   const [pagination, setPagination] = useState(() => {
     const savedPageIndex = sessionStorage.getItem("pageIndex");
@@ -24,34 +25,92 @@ const Sessions = () => {
     };
   });
 
-  // Fetch sessions
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    axios
-      .get("http://localhost:3005/session", {
-        headers: {
-          token,
-          "Content-Type": "application/json",
-        },
-      })
-      .then((res) => {
-        if (res.data.success) {
-          setSessions(res.data.sessions);
-        } else {
-          toast.error("Error: " + res.data.message);
-        }
-      })
-      .catch((err) => {
-        console.error("Fetch error:", err);
-        toast.error("Failed to fetch sessions.");
-      });
-  }, []);
+  // // Fetch sessions
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   axios
+  //     .get("http://localhost:3005/session", {
+  //       headers: {
+  //         token,
+  //         "Content-Type": "application/json",
+  //       },
+  //     })
+  //     .then((res) => {
+  //       if (res.data.success) {
+  //         setSessions(res.data.sessions);
+  //       } else {
+  //         toast.error("Error: " + res.data.message);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.error("Fetch error:", err);
+  //       toast.error("Failed to fetch sessions.");
+  //     });
+  // }, []);
 
   // Redirect to Edit Page
   const handleEdit = (id) => {
     const basePath = location.pathname.startsWith("/qm") ? "/qm" : "/admin";
     navigate(`${basePath}/addSession?id=${id}`);
   };
+
+  const fetchSessions = async () => {
+    const token = localStorage.getItem("token");
+  
+    try {
+      const res = await axios.get("http://localhost:3005/session", {
+        headers: {
+          token,
+          "Content-Type": "application/json",
+        },
+      });
+  
+      if (res.data.success) {
+        setSessions(res.data.sessions);
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (err) {
+      console.error("Fetch error:", err);
+      toast.error("Failed to fetch sessions.");
+    }
+  };
+  
+
+  const handleSearch = async (query) => {
+    const token = localStorage.getItem("token");
+  
+    if (!query) {
+      // If search is cleared, re-fetch all sessions
+      return fetchSessions();
+    }
+  
+    try {
+      const response = await axios.get("http://localhost:3005/session/search", {
+        headers: {
+          token,
+        },
+        params: {
+          query,
+        },
+      });
+  
+      if (response.data.success) {
+        setSessions(response.data.sessions);
+      } else {
+        toast.error("Search failed: " + response.data.message);
+      }
+    } catch (error) {
+      console.error("Search error:", error);
+      toast.error("Error searching sessions.");
+    }
+  };
+  
+  useEffect(() => {
+    fetchSessions();
+  }, []);
+  
+
 
   // Ask to confirm delete
   const confirmDelete = (id) => {

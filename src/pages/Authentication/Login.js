@@ -27,6 +27,7 @@ import { loginUser, apiError } from "../../store/actions";
 
 // Assets
 import logo3 from "../../assets/images/A-logo2.png";
+import { toast } from "react-toastify";
 
 const Login = (props) => {
   const dispatch = useDispatch();
@@ -87,11 +88,11 @@ const Login = (props) => {
             props.router.navigate("/");
           }
         } else {
-          alert("Invalid email or password");
+          toast.error("Invalid email or password");
         }
       } catch (error) {
         console.error("Login failed:", error);
-        alert("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       }
     },
   });

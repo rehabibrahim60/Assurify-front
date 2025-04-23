@@ -8,6 +8,7 @@ import {
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import { toast } from "react-toastify";
 import { jwtDecode } from "jwt-decode";
+import Select from "react-select";
 
 
 
@@ -97,10 +98,17 @@ const AddSession = () => {
     }
   }, [sessionId]);
 
-  const handleChange = (e) => {
-    const { id, value } = e.target;
-    setFormData(prev => ({ ...prev, [id]: value }));
+  const handleChange = (e, selectData = null) => {
+    if (selectData) {
+      // react-select value
+      const { name, value } = selectData;
+      setFormData(prev => ({ ...prev, [name]: value }));
+    } else {
+      const { id, value } = e.target;
+      setFormData(prev => ({ ...prev, [id]: value }));
+    }
   };
+  
 
   const handleFileChange = (e) => {
     const { id, files } = e.target;
@@ -237,7 +245,18 @@ const handleSubmit = async (e) => {
   }
 };
 
+  const tutorOptions = tutors.map(t => ({ label: t.name, value: t._id }));
 
+  // controlled value: find current selected tutor option
+  const selectedTutor = tutorOptions.find(opt => opt.value === formData.tutor) || null;
+
+  const pdfOptions = pdfs.map(pdf => ({ label: pdf.title, value: pdf._id }));
+  const selectedPdf = pdfOptions.find(opt => opt.value === formData.pdf) || null;
+  // Assuming qms is an array like: [{ _id: '1', name: 'QM Name' }, ...]
+  const qmOptions = qms.map(qm => ({ label: qm.name, value: qm._id }));
+
+  // Controlled value for selected QM
+  const selectedQM = qmOptions.find(opt => opt.value === formData.qm) || null;
 
   document.title = editMode ? "Edit Session" : "Add Session";
 
@@ -258,12 +277,16 @@ const handleSubmit = async (e) => {
                     </Col>
                     <Col lg={6}>
                       <Label htmlFor="tutor">Select Tutor</Label>
-                      <Input type="select" id="tutor" value={formData.tutor} onChange={handleChange} required>
-                        <option value="">Select Tutor</option>
-                        {tutors.map(t => (
-                          <option key={t._id} value={t._id}>{t.name}</option>
-                        ))}
-                      </Input>
+                      <Select
+                        id="tutor"
+                        options={tutorOptions}
+                        value={selectedTutor}
+                        onChange={(selected) =>
+                          setFormData(prev => ({ ...prev, tutor: selected ? selected.value : "" }))
+                        }
+                        isClearable
+                      />
+
                     </Col>
                   </Row>
 
@@ -276,12 +299,16 @@ const handleSubmit = async (e) => {
                       </Input>
 
                       {formData.pdfOption === "select" ? (
-                        <Input type="select" id="pdf" className="mt-2" value={formData.pdf} onChange={handleChange} required>
-                          <option value="">Select PDF</option>
-                          {pdfs.map(pdf => (
-                            <option key={pdf._id} value={pdf._id}>{pdf.title}</option>
-                          ))}
-                        </Input>
+                        
+                        <Select
+                          id="pdf"
+                          options={pdfOptions}
+                          value={selectedPdf}
+                          onChange={(selected) =>
+                            setFormData(prev => ({ ...prev, pdf: selected ? selected.value : "" }))
+                          }
+                          isClearable
+                        />
                       ) : (
                         <>
                           <Input
@@ -322,12 +349,15 @@ const handleSubmit = async (e) => {
                     <Col lg={6}>
                       <Label htmlFor="qm">Quality Member</Label>
                       {currentUserRole === "admin" ? (
-                        <Input type="select" id="qm" value={formData.qm} onChange={handleChange} required>
-                          <option value="">Select QM</option>
-                          {qms.map(qm => (
-                            <option key={qm._id} value={qm._id}>{qm.name}</option>
-                          ))}
-                        </Input>
+                        <Select
+                          id="qm"
+                          options={qmOptions}
+                          value={selectedQM}
+                          onChange={(selected) =>
+                            setFormData(prev => ({ ...prev, qm: selected ? selected.value : "" }))
+                          }
+                          isClearable
+                        />
                       ) : (
                         <Input type="text" id="qm" value={currentUserId} disabled />
                       )}

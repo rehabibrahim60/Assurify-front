@@ -1,8 +1,11 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useEffect, useState  } from "react";
 import { Button } from "reactstrap";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
 import TableContainer from "../../components/Common/DataTableContainer";
+import axios from "axios";
+import { toast } from "react-toastify";
+import ConfirmModal from "../../components/ConfirmModal/ConfirmModal";
 
 const Reports = () => {
   const navigate = useNavigate();
@@ -10,14 +13,66 @@ const Reports = () => {
 
   const basePath = location.pathname.startsWith("/qm") ? "/qm" : "/admin";
 
+  const [reportData, setReportData] = useState([]);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedReportId, setSelectedReportId] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+  
+    axios
+      .get("http://localhost:3005/report", {
+        headers: { token },
+      })
+      .then((res) => {
+        if (res.data.success) {
+          setReportData(res.data.reports); // assuming your API returns `reports` array
+        } else {
+          console.error("Failed to fetch reports:", res.data.message);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching reports:", err);
+      });
+  }, []);
+  
+
   const handleEdit = (id) => {
-    navigate(`${basePath}/addReport?id=${id}`);
+    navigate(`${basePath}/video?id=${id}`);
   };
 
   const handleDelete = (id) => {
-    console.log("Delete record with ID:", id);
-    // Add delete logic here
+    setSelectedReportId(id);
+    setShowConfirmModal(true);
   };
+  
+  const confirmDelete = () => {
+    const token = localStorage.getItem("token");
+  
+    axios
+      .delete(`http://localhost:3005/report/${selectedReportId}`, {
+        headers: { token },
+      })
+      .then((res) => {
+        if (res.data.success) {
+          toast.success("report deleted successfully")
+          setReportData((prev) => prev.filter((r) => r._id !== selectedReportId));
+        } else {
+          console.error("Failed to delete report:", res.data.message);
+          toast.error("Failed to delete report:", res.data.message);
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting report:", err);
+        toast.error("Error deleting report:", err);
+      })
+      .finally(() => {
+        setShowConfirmModal(false);
+        setSelectedReportId(null);
+      });
+  };
+  
+
 
   const columns = useMemo(
     () => [
@@ -32,21 +87,43 @@ const Reports = () => {
         enableSorting: false,
       },
       { header: "Session ID", accessorKey: "session_id" },
-      { header: "Session Text", accessorKey: "session_text" },
       { header: "Similarity", accessorKey: "similarity" },
-      { header: "Bad Words", accessorKey: "bad_word" },
-      { header: "Noise", accessorKey: "noise" },
-      { header: "Upnormal Behaviour", accessorKey: "upnormal_behaviour" },
-      { header: "Time Tracking", accessorKey: "time_tracking" },
       {
-        header: "Report Link",
-        accessorKey: "report_link",
-        cell: ({ row }) => (
-          <Link to={`${basePath}/report-temp?id=${row.original.session_id}`} >
-            View Report
-          </Link>
-        ),
+        header: "Bad Words",
+        cell: ({ row }) =>
+          
+          row.original.bad_word.length
+            ? row.original.bad_word.map((bw, i) => (
+                <div key={i}>{bw.word}</div>
+              ))
+            : "None",
       },
+      { header: "Noisy Detection", accessorKey: "noisy_detection" },
+      // { header: "Key Points", accessorKey: "key_points" },
+      // { header: "Summary", accessorKey: "summary" },
+      {
+        header: "Abnormal Times",
+        cell: ({ row }) =>
+          row.original.abnormal_times.length
+            ? row.original.abnormal_times.map((t, i) => (
+                <div key={i}>
+                  {t.start_time} - {t.end_time}
+                </div>
+              ))
+            : "None",
+      },
+      {
+        header: "Time Tracking",
+        cell: ({ row }) =>
+          row.original.time_tracking.length
+            ? row.original.time_tracking.map((t, i) => (
+                <div key={i}>
+                  {t.start_frame} - {t.end_frame}
+                </div>
+              ))
+            : "None",
+      },
+      { header: "Total Silence Duration", accessorKey: "total_silence_duration" },
       {
         header: "Actions",
         accessorKey: "actions",
@@ -63,7 +140,7 @@ const Reports = () => {
             <Button
               color="danger"
               size="sm"
-              onClick={() => handleDelete(row.original.session_id)}
+              onClick={() => handleDelete(row.original._id)}
             >
               Delete
             </Button>
@@ -73,18 +150,9 @@ const Reports = () => {
     ],
     [navigate, basePath]
   );
+  
 
-  const data = [
-    {
-      session_id: "1",
-      session_text: "Sample text",
-      similarity: 95,
-      bad_word: "None",
-      noise: "Low",
-      upnormal_behaviour: "None",
-      time_tracking: "10:00 - 10:30 (Speak)",
-    },
-  ];
+  const data = reportData
 
   document.title = "Data Tables | Skote - React Admin & Dashboard Template";
 
@@ -103,6 +171,14 @@ const Reports = () => {
           tableClass="table-bordered table-nowrap dt-responsive nowrap w-100 dataTable no-footer dtr-inline"
         />
       </div>
+      <ConfirmModal
+        isOpen={showConfirmModal}
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this report?"
+        onConfirm={confirmDelete}
+        onCancel={() => setShowConfirmModal(false)}
+      />
+
     </div>
   );
 };
