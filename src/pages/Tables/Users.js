@@ -128,13 +128,13 @@ const handleDeleteConfirmed = async () => {
           <>
             <button
               className="btn btn-sm btn-primary me-2"
-              onClick={() => handleEdit(row.original.id_by_organization)}
+              onClick={() => handleEdit(row.original._id)}
             >
               Edit
             </button>
             <button
               className="btn btn-sm btn-danger"
-              onClick={() => confirmDelete(row.original.id_by_organization)}
+              onClick={() => confirmDelete(row.original._id)}
             >
               Delete
             </button>

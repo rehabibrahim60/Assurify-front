@@ -161,7 +161,7 @@ const AddQm = () => {
                       />
                     </div>
 
-                    <div className="mb-3">
+                    {!editMode && <div className="mb-3">
                       <Label className="form-label" htmlFor="password">Password:</Label>
                       <Input
                         type="password"
@@ -171,7 +171,7 @@ const AddQm = () => {
                         onChange={handleChange}
                         required
                       />
-                    </div>
+                    </div>}
 
                     <Button type="submit" color="primary">
                       Submit

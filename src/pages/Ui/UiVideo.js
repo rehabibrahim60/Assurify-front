@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Card, CardBody, CardTitle, Col, Container, Row, Button, Form, Label, Input } from "reactstrap";
 import Breadcrumbs from "../../components/Common/Breadcrumb";
+import { toast } from "react-toastify";
 
 const UiVideo = () => {
   document.title = "Session Record | Veltrix - React Admin & Dashboard Template";
@@ -95,9 +96,88 @@ const UiVideo = () => {
     }));
   };
 
-  const handleClick = () => {
-    const redirectPath = location.pathname.startsWith("/admin") ? "/admin/report-temp" : "/qm/report-temp";
-    navigate(redirectPath/*, { state: { session: fullReport } }*/);
+  const handleClick = async () => {
+    // If report not found, generate a new report
+    if (reportNotFound) {
+      try {
+        const formData = new FormData();
+        formData.append('sessionId', sessionId);
+        
+        // Download video file if URL is available
+        if (session.video?.url) {
+          try {
+            const videoBlobRes = await axios.get(session.video.url, {
+              responseType: "blob",
+              headers: { token },
+            });
+            
+            const videoFile = new File(
+              [videoBlobRes.data],
+              "session_video.mp4", // Assuming MP4 format, adjust if needed
+              { type: "video/mp4" }  // Adjust MIME type if needed
+            );
+            
+            formData.append('video', videoFile);
+          } catch (error) {
+            console.error("Error downloading video:", error);
+            toast.error("Error downloading video")
+            // Continue without the video or handle as needed
+          }
+        }
+        
+        // Download PDF file if URL is available
+        if (session.pdf_id?.file?.url) {
+          try {
+            const pdfBlobRes = await axios.get(session.pdf_id.file.url, {
+              responseType: "blob",
+              headers: { token },
+            });
+            
+            const pdfFile = new File(
+              [pdfBlobRes.data],
+              "session_document.pdf",
+              { type: "application/pdf" }
+            );
+            
+            formData.append('pdf', pdfFile);
+          } catch (error) {
+            console.error("Error downloading PDF:", error);
+            toast.error("Error downloading PDF")
+            // Continue without the PDF or handle as needed
+          }
+        }
+        console.log(formData);
+        
+        
+        // Send request to generate report
+        const response = await axios.post(
+          "http://localhost:3005/report", 
+          formData,
+          { 
+            headers: { 
+              token,
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+        );
+        
+        // Update the report state with the newly generated report
+        setReport(response.data.report);
+        setReportNotFound(false);
+        
+        // Show success notification
+        setShowNotification(true);
+        setTimeout(() => setShowNotification(false), 3000);
+      } catch (error) {
+        console.error("Error generating report:", error);
+        toast.error("Error generating report")
+        // You might want to add error handling here, like displaying an error message
+      }
+    } else {
+      // If report exists, navigate to the report page
+      const redirectPath = location.pathname.startsWith("/admin") ? "/admin/report-temp" : "/qm/report-temp";
+      navigate(redirectPath/*, { state: { session: fullReport } }*/);
+    }
   };
 
   const handleInputChange = (e) => {
@@ -149,14 +229,7 @@ const UiVideo = () => {
     }
   };
   
-  const handleAddBadword = () => {
-    if (!newBadword.trim()) return;
-    setReport({
-      ...report,
-      bad_word: [...report.bad_word, { word: newBadword }],
-    });
-    setNewBadword(""); // Clear input
-  };
+
   
   const handleRemoveBadword = (index) => {
     const updated = [...report.bad_word];
@@ -531,12 +604,24 @@ const UiVideo = () => {
                   )}
 
                   <div className="d-flex justify-content-end mt-3">          
-                    <Button
-                      onClick={handleClick}
-                      color="primary"
-                    >
-                      View Report
-                    </Button>
+                    {reportNotFound?
+                      (
+                        <Button
+                          onClick={handleClick}
+                          color="primary"
+                        >
+                          Generate Report
+                        </Button>
+                      )
+                      :(
+                        <Button
+                          onClick={handleClick}
+                          color="primary"
+                        >
+                          View Report
+                        </Button>
+                      )
+                    }
                   </div>
                 </CardBody>
               </Card>
