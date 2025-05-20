@@ -272,8 +272,8 @@ const handleSubmit = async (e) => {
                 <Form onSubmit={handleSubmit}>
                   <Row>
                     <Col lg={6}>
-                      <Label htmlFor="title">Title (optional)</Label>
-                      <Input type="text" id="title" value={formData.title} onChange={handleChange}  />
+                      <Label htmlFor="title">Title </Label>
+                      <Input type="text" id="title" value={formData.title} onChange={handleChange} required />
                     </Col>
                     <Col lg={6}>
                       <Label htmlFor="tutor">Select Tutor</Label>

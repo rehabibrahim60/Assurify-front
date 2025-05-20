@@ -206,6 +206,31 @@ const QmSidebarContent = props => {
                 </li> */}
               </ul>
             </li>
+            <li>
+              <Link to="/#" className="has-arrow waves-effect">
+                <i className="far fa-file-pdf"></i>
+                <span>{props.t("PDFs")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/qm/pdf">{props.t("All PDFs")}</Link>
+                </li>
+                <li>
+                  <Link to="/qm/addPdf">{props.t("Add PDF")}</Link>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <Link to="/#" className="has-arrow waves-effect">
+                <i className="mdi mdi-book-education-outline"></i>
+                <span>{props.t("Courses")}</span>
+              </Link>
+              <ul className="sub-menu" aria-expanded="false">
+                <li>
+                  <Link to="/qm/course">{props.t("All Courses")}</Link>
+                </li>
+              </ul>
+            </li>
 
             
           </ul>

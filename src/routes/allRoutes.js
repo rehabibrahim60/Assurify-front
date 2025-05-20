@@ -24,6 +24,9 @@ import Tutors from "../pages/Tables/Tutors"
 import Users from "../pages/Tables/Users"
 import AssignedSessions from "../pages/Tables/AssignedSessions";
 import QmFlags from "../pages/Tables/QmFlags";
+import Pdfs from "../pages/Tables/Pdfs";
+import Courses from "../pages/Tables/Courses";
+import QmCourses from "../pages/Tables/QmCourses";
 
 
 // Forms
@@ -34,6 +37,8 @@ import AddReport from "../pages/Forms/AddReport";
 import AddSession from "../pages/Forms/AddSession";
 import AddTutor from "../pages/Forms/AddTutor";
 import AddTutorFlag from "../pages/Forms/AddTutorFlag";
+import AddCourse from "../pages/Forms/AddCourse";
+import AddPdf from "../pages/Forms/AddPdf";
 
 
 //Pages
@@ -58,6 +63,8 @@ const adminRoutes = [
   { path: "/admin/tutor", component: <Tutors /> },
   { path: "/admin/tutorFlag", component: <TutorFlags /> },
   { path: "/admin/user", component: < Users/> },
+  { path: "/admin/pdf", component: < Pdfs/> },
+  { path: "/admin/course", component: < Courses/> },
 
   // Forms
   { path: "/admin/addSession", component: <AddSession /> },
@@ -66,6 +73,8 @@ const adminRoutes = [
   { path: "/admin/addTutor", component: <AddTutor /> },
   { path: "/admin/addReport", component: <AddReport /> },
   { path: "/admin/addTutorFlag", component: <AddTutorFlag /> },
+  { path: "/admin/addCourse", component: <AddCourse /> },
+  { path: "/admin/addPdf", component: <AddPdf /> },
 
 
   //my pages
@@ -87,6 +96,8 @@ const qmRoutes = [
     { path: "/qm/session", component: <Sessions /> },
     { path: "/qm/assignedSession", component: <AssignedSessions /> },
     { path: "/qm/tutorFlag", component: <TutorFlags /> },
+    { path: "/qm/pdf", component: <Pdfs /> },
+    { path: "/qm/course", component: <QmCourses /> },
 
   
     // Forms,
@@ -96,6 +107,7 @@ const qmRoutes = [
     { path: "/qm/addTutor", component: <AddTutor /> },
     { path: "/qm/addReport", component: <AddReport /> },
     { path: "/qm/addTutorFlag", component: <AddTutorFlag /> },
+    { path: "/qm/addPdf", component: <AddPdf /> },
   
     //my pages
     { path: "/qm/video", component: <UiVideo /> },
