@@ -57,27 +57,15 @@ const ProfileMenu = props => {
           />
         </DropdownToggle>
         <DropdownMenu className="dropdown-menu-end">
-          <DropdownItem tag="a" href="/profile">
-            {" "}
-            <i className="mdi mdi-account-circle font-size-17 align-middle me-1" />
-            {props.t("Profile")}{" "}
-          </DropdownItem>
-          <DropdownItem tag="a" href="#">
-            {" "}
-            <i className="mdi mdi-wallet font-size-17 align-middle me-1" />
-            {props.t("My Wallet")}{" "}
-          </DropdownItem>
-          <DropdownItem tag="a" href="#">
-            {" "}
-            <i className="mdi mdi-cog font-size-17 align-middle me-1" />
-            {props.t("Settings")}{" "}<span className="badge bg-success ms-auto">11</span>
-          </DropdownItem>
-          <DropdownItem tag="a" href="auth-lock-screen">
-          <i className="mdi mdi-lock-open-outline font-size-17 align-middle me-1" />
-            {props.t("Lock screen")}
+          <DropdownItem >
+            <Link to="/qm/profile">
+              {" "}
+              <i className="mdi mdi-account-circle font-size-17 align-middle me-1" />
+              {props.t("Profile")}{" "}
+            </Link>
           </DropdownItem>
           <div className="dropdown-divider" />
-          <Link to="/logout" className="dropdown-item text-danger">
+          <Link to="/" className="dropdown-item text-danger">
           <i className="bx bx-power-off font-size-17 align-middle me-1 text-danger" />
             <span>{props.t("Logout")}</span>
           </Link>

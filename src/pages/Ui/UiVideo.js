@@ -375,6 +375,10 @@ const UiVideo = () => {
                     </div>
                       <div>
                         <Label className="mt-3">Time Tracking</Label>
+                        {report.time_tracking.length === 0 ? (
+                          <p className="text-success">No silance beriods</p>
+                        )
+                        :(<>
                         {report.time_tracking.map((entry, idx) => (
                           <Row key={idx} className="mb-2">
                             <Col md="5">
@@ -404,6 +408,7 @@ const UiVideo = () => {
                             </Col>
                           </Row>
                         ))}
+                        </>)}
                         {isEditing && (
                           
                           <Button color="success" onClick={() => handleAddRow("time_tracking")}>Add Frame</Button>

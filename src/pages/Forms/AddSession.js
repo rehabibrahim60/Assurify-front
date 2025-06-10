@@ -42,6 +42,9 @@ const AddSession = () => {
     video: "",
     file: ""
   });
+  const [courses, setCourses] = useState([]);
+  const [lessons, setLessons] = useState([]);
+
   
   const token = localStorage.getItem("token");
 
@@ -54,6 +57,22 @@ const AddSession = () => {
       .then(res => setTutors(res.data.tutors))
       .catch(err => console.error("Fetch tutors error:", err));
   }, []);
+
+  useEffect(() => {
+    axios.get("http://localhost:3005/course", { headers: { token } })
+      .then(res => setCourses(res.data.courses))
+      .catch(err => console.error("Fetch courses error:", err));
+
+  }, []);
+
+  useEffect(() => {
+    if (!formData.course_id) return; // Don't call API if no course selected
+
+    axios
+      .get(`http://localhost:3005/course/lesson/${formData.course_id}`, { headers: { token } })
+      .then(res => setLessons(res.data.lessons))
+      .catch(err => console.error("Fetch lessons error:", err));
+  }, [formData.course_id]);
 
   
   useEffect(() => {
@@ -91,6 +110,8 @@ const AddSession = () => {
             grade: session.grade || "",
             lesson: session.lesson || "",
             pdfTitle: "",
+            course_id: "",
+            lesson_id: "",
             file: null
           });
         })
@@ -136,9 +157,9 @@ const AddSession = () => {
 const handleSubmit = async (e) => {
   e.preventDefault();
 
-  if (isSubmitting) return; // لو بيبعت بالفعل، منعملش حاجة
+  if (isSubmitting) return;
 
-  setIsSubmitting(true); // قفل الزر
+  setIsSubmitting(true);
 
   const method = editMode ? "patch" : "post";
   const url = editMode
@@ -159,7 +180,8 @@ const handleSubmit = async (e) => {
     try {
       const pdfData = new FormData();
       pdfData.append("file", formData.file);
-      pdfData.append("title", formData.pdfTitle);
+      pdfData.append("course_id", formData.course_id);
+      pdfData.append("lesson_id", formData.lesson_id);
       const pdfRes = await axios.post("http://localhost:3005/pdf", pdfData, {
         headers: { token },
       });
@@ -199,17 +221,17 @@ const handleSubmit = async (e) => {
       analyzeData.append("session_id", addedSessionId);
       analyzeData.append("video", formData.video);
 
-      // Handle PDF file (upload or fetch from existing)
       if (formData.pdfOption === "upload") {
         analyzeData.append("pdf", formData.file);
       } else if (formData.pdfOption === "select" && formData.pdf) {
         try {
-          console.log(formData.pdf);
-          
-          const pdfBlobRes = await axios.get(`http://localhost:3005/pdf/${formData.pdf}/download`, {
-            responseType: "blob",
-            headers: { token },
-          });
+          const pdfBlobRes = await axios.get(
+            `http://localhost:3005/pdf/${formData.pdf}/download`,
+            {
+              responseType: "blob",
+              headers: { token },
+            }
+          );
 
           const pdfFile = new File(
             [pdfBlobRes.data],
@@ -226,10 +248,11 @@ const handleSubmit = async (e) => {
         }
       }
 
-
-      const reportRes = await axios.post("http://localhost:3005/report", analyzeData, {
-        headers: { token },
-      });
+      const reportRes = await axios.post(
+        "http://localhost:3005/report",
+        analyzeData,
+        { headers: { token } }
+      );
 
       if (reportRes.status === 200 || reportRes.status === 201) {
         toast.success(editMode ? "Session updated successfully!" : "Session added successfully!");
@@ -241,9 +264,10 @@ const handleSubmit = async (e) => {
     console.error("Error submitting session or report:", err);
     toast.error("Error submitting session.");
   } finally {
-    setIsSubmitting(false); // رجع الزر شغال
+    setIsSubmitting(false);
   }
 };
+
 
   const tutorOptions = tutors.map(t => ({ label: t.name, value: t._id }));
 
@@ -320,6 +344,22 @@ const handleSubmit = async (e) => {
                             className="mt-2"
                             required
                           />
+                          <Select
+                            options={courses.map(c => ({ label: c.title, value: c._id }))}
+                            onChange={(selected) => setFormData(prev => ({ ...prev, course_id: selected?.value || "" }))}
+                            placeholder="Select Course"
+                            className="mt-2"
+                            isClearable
+                          />
+
+                          <Select
+                            options={lessons.map(l => ({ label: l.lesson, value: l._id }))}
+                            onChange={(selected) => setFormData(prev => ({ ...prev, lesson_id: selected?.value || "" }))}
+                            placeholder="Select Lesson"
+                            className="mt-2"
+                            isClearable
+                          />
+
                           <Input
                             type="file"
                             id="file"

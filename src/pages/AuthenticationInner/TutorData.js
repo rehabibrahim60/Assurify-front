@@ -43,8 +43,8 @@ const TutorData = () => {
         setTutorData(tutor); // Store tutor data
 
         // Fetch reports only if tutor exists
-        if (tutor?.id_by_organization) {
-          fetchReports(tutor.id_by_organization, token);
+        if (tutor?._id) {
+          fetchReports(tutor._id, token);
         }
       } catch (err) {
         setError(err.response?.data?.message || "Tutor not found. Please try again.");
@@ -57,7 +57,7 @@ const TutorData = () => {
   // Fetch reports using tutor ID
   const fetchReports = async (tutorId, token) => {
     try {
-      const reportsResponse = await axios.get(`http://localhost:3005/reports/tutor/${tutorId}`, {
+      const reportsResponse = await axios.get(`http://localhost:3005/report/tutor/${tutorId}`, {
         headers: {
           token,
           "Content-Type": "application/json",
@@ -89,7 +89,7 @@ const TutorData = () => {
                     <h5 className="text-white font-size-20">Tutor Credentials</h5>
                     <p className="text-white-50">Enter your national ID</p>
                     <Link to="/dashboard" className="logo logo-admin">
-                      <img src={logo} height="24" alt="logo" />
+                      {/* <img src={logo} height="24" alt="logo" /> */}
                     </Link>
                   </div>
                 </div>
@@ -142,14 +142,19 @@ const TutorData = () => {
 
                       <h5 className="text-primary mt-4">Reports</h5>
                       {tutorReports.length > 0 ? (
-                        <ul>
+                        <ul className="list-unstyled">
                           {tutorReports.map((report, index) => (
-                            <li key={index}>{report.description} - <strong>{report.date}</strong></li>
+                            <li key={report} className="mb-2">
+                              <Link to={`/report-temp?id=${report}`} className="text-primary text-decoration-underline">
+                                Report {index + 1}
+                              </Link>
+                            </li>
                           ))}
                         </ul>
                       ) : (
                         <p>No reports available.</p>
                       )}
+
                     </div>
                   )}
                 </CardBody>

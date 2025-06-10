@@ -125,6 +125,18 @@ const Reports = () => {
       },
       { header: "Total Silence Duration", accessorKey: "total_silence_duration" },
       {
+        header: "Tutor View",
+        cell: ({ row }) => (
+          <Link
+            to={`${basePath}/report-temp?id=${row.original._id}`}
+            className="btn btn-info btn-sm"
+          >
+            View
+          </Link>
+        ),
+      },
+
+      {
         header: "Actions",
         accessorKey: "actions",
         cell: ({ row }) => (

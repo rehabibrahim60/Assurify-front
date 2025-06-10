@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -14,39 +14,7 @@ const Sessions = () => {
   const [sessions, setSessions] = useState([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [sessionToDelete, setSessionToDelete] = useState(null);
-  
-
-  const [pagination, setPagination] = useState(() => {
-    const savedPageIndex = sessionStorage.getItem("pageIndex");
-    const savedPageSize = sessionStorage.getItem("pageSize");
-    return {
-      pageIndex: savedPageIndex ? parseInt(savedPageIndex) : 0,
-      pageSize: savedPageSize ? parseInt(savedPageSize) : 10,
-    };
-  });
-
-  // // Fetch sessions
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   axios
-  //     .get("http://localhost:3005/session", {
-  //       headers: {
-  //         token,
-  //         "Content-Type": "application/json",
-  //       },
-  //     })
-  //     .then((res) => {
-  //       if (res.data.success) {
-  //         setSessions(res.data.sessions);
-  //       } else {
-  //         toast.error("Error: " + res.data.message);
-  //       }
-  //     })
-  //     .catch((err) => {
-  //       console.error("Fetch error:", err);
-  //       toast.error("Failed to fetch sessions.");
-  //     });
-  // }, []);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Redirect to Edit Page
   const handleEdit = (id) => {
@@ -54,7 +22,10 @@ const Sessions = () => {
     navigate(`${basePath}/addSession?id=${id}`);
   };
 
-  const fetchSessions = async () => {
+  const fetchSessions = useCallback(async () => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
     const token = localStorage.getItem("token");
   
     try {
@@ -73,16 +44,21 @@ const Sessions = () => {
     } catch (err) {
       console.error("Fetch error:", err);
       toast.error("Failed to fetch sessions.");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [isLoading]);
   
-
-  const handleSearch = async (query) => {
+  const handleSearch = useCallback(async (query) => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
     const token = localStorage.getItem("token");
   
-    if (!query) {
+    if (!query || query.trim() === "") {
       // If search is cleared, re-fetch all sessions
-      return fetchSessions();
+      await fetchSessions();
+      return;
     }
   
     try {
@@ -91,7 +67,7 @@ const Sessions = () => {
           token,
         },
         params: {
-          query,
+          query: query.trim(),
         },
       });
   
@@ -103,14 +79,15 @@ const Sessions = () => {
     } catch (error) {
       console.error("Search error:", error);
       toast.error("Error searching sessions.");
+    } finally {
+      setIsLoading(false);
     }
-  };
+  }, [isLoading, fetchSessions]);
   
+  // Fetch sessions on component mount
   useEffect(() => {
     fetchSessions();
   }, []);
-  
-
 
   // Ask to confirm delete
   const confirmDelete = (id) => {
@@ -215,7 +192,7 @@ const Sessions = () => {
         ),
       },
     ];
-  }, [location.pathname]);
+  }, [location.pathname, navigate]);
 
   document.title = "Assigned Sessions | React Admin Template";
 
@@ -230,11 +207,11 @@ const Sessions = () => {
           isGlobalFilter={true}
           isPagination={true}
           SearchPlaceholder="Search Sessions..."
-          paginationState={pagination}
-          setPagination={setPagination}
-          pagination="pagination"
+          onSearch={handleSearch}
+          paginationClassName="pagination"
           paginationWrapper="dataTables_paginate paging_simple_numbers"
           tableClass="table-bordered table-nowrap dt-responsive nowrap w-100 dataTable no-footer dtr-inline"
+          isCustomPageSize={true}
         />
 
         {/* Confirm Delete Modal */}

@@ -14,6 +14,7 @@ import TutorData from "../pages/AuthenticationInner/TutorData";
 
 // Dashboard
 import Dashboard from "../pages/Dashboard/index";
+import DashboardQm from "../pages/Dashboard_Qm/index";
 
 //Tables
 import Flags from "../pages/Tables/Flags"
@@ -88,7 +89,8 @@ const adminRoutes = [
 ];
 
 const qmRoutes = [
-  { path: "/qm", component: <UserProfile /> }, // Default QM route
+  { path: "/qm", component: <DashboardQm /> }, // Default QM route
+  { path: "/qm/profile", component: <UserProfile /> }, // profile
 
     // Tables
     { path: "/qm/flag", component: <QmFlags /> },
@@ -128,6 +130,8 @@ const authRoutes = [
 
   { path: "/auth-lock-screen", component: <LockScreen /> },
   { path: "/tutor-data", component: <TutorData /> },
+
+  { path: "/report-temp", component: <ReportTemp /> },
 
 ];
 

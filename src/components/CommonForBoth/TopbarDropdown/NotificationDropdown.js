@@ -12,6 +12,8 @@ import { withTranslation } from "react-i18next";
 const NotificationDropdown = (props) => {
   const [menu, setMenu] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [showAll, setShowAll] = useState(false);
+
 
   useEffect(() => {
   const token = localStorage.getItem("token");
@@ -40,10 +42,46 @@ const NotificationDropdown = (props) => {
   }
 }, []);
 
+const handleToggle = async () => {
+  const nextMenuState = !menu;
+  setMenu(nextMenuState);
+
+  // If closing the dropdown, then mark as read
+  if (!nextMenuState) {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decoded = jwtDecode(token);
+        const userId = decoded._id;
+
+        await axios.patch(
+          `http://localhost:3005/notification/${userId}`,
+          {},
+          { headers: { token } }
+        );
+
+        setNotifications((prev) =>
+          prev.map(n => ({ ...n, isRead: true }))
+        );
+      } catch (error) {
+        console.error("Failed to mark notifications as read", error);
+      }
+    }
+  }
+};
+
+
+
+
+  const displayedNotifications = showAll
+    ? notifications
+    : notifications.filter(n => !n.isRead);
+
+
   return (
     <Dropdown
       isOpen={menu}
-      toggle={() => setMenu(!menu)}
+      toggle={handleToggle}
       className="dropdown d-inline-block"
       tag="li"
     >
@@ -53,8 +91,13 @@ const NotificationDropdown = (props) => {
         id="page-header-notifications-dropdown"
       >
         <i className="mdi mdi-bell-outline"></i>
-        <span className="badge bg-danger rounded-pill">{notifications.length}</span>
+        {notifications.filter(n => !n.isRead).length > 0 && (
+          <span className="badge bg-danger rounded-pill">
+            {notifications.filter(n => !n.isRead).length}
+          </span>
+        )}
       </DropdownToggle>
+
 
       <DropdownMenu className="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0">
         <div className="p-3">
@@ -68,7 +111,7 @@ const NotificationDropdown = (props) => {
         </div>
 
         <SimpleBar style={{ height: "230px" }}>
-          {notifications.length >0 ? notifications.map((notification, index) => (
+          {displayedNotifications.length >0 ? displayedNotifications.map((notification, index) => (
             <Link to="#" className="text-reset notification-item" key={index}>
               <div className="d-flex">
                 <div className="avatar-xs me-3">
@@ -88,10 +131,15 @@ const NotificationDropdown = (props) => {
         </SimpleBar>
 
         <div className="p-2 border-top d-grid">
-          <Link className="btn btn-sm btn-link font-size-14 btn-block text-center" to="#">
+          <Link
+            className="btn btn-sm btn-link font-size-14 btn-block text-center"
+            to="#"
+            onClick={() => setShowAll(true)}
+          >
             <i className="mdi mdi-arrow-right-circle me-1"></i>
             {props.t("View all")}
           </Link>
+
         </div>
       </DropdownMenu>
     </Dropdown>

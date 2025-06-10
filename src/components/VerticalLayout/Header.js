@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { connect } from "react-redux";
 import { Form, Dropdown, DropdownMenu, DropdownItem, DropdownToggle, Input, Button } from "reactstrap";
 
-import { Link } from "react-router-dom";
+import { Link , } from "react-router-dom";
 
 // Import menuDropdown
 import LanguageDropdown from "../CommonForBoth/TopbarDropdown/LanguageDropdown";
@@ -34,7 +34,7 @@ const Header = props => {
   const [singlebtn, setSinglebtn] = useState(false);
 
   const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
+const basePath = location.pathname.startsWith("/admin") ? "/admin" : "/qm";
   function toggleFullscreen() {
     if (
       !document.fullscreenElement &&
@@ -71,7 +71,7 @@ const Header = props => {
       body.classList.toggle("sidebar-enable");
     }
   }
-  const basePath = location.pathname.startsWith("/admin") ? "/admin" : "/qm";
+  const isAdmin = location.pathname.startsWith("/admin") ? true : false;
   return (
     <React.Fragment>
       <header id="page-topbar">
@@ -135,8 +135,8 @@ const Header = props => {
               </button>
             </div>
 
-            <NotificationDropdown />
-            <ProfileMenu />
+            {!isAdmin && <NotificationDropdown />}
+            {!isAdmin && <ProfileMenu />}
 
             <div
               onClick={() => {

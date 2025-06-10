@@ -23,6 +23,7 @@ import servicesIcon1 from "../../assets/images/services-icon/01.png";
 import servicesIcon2 from "../../assets/images/services-icon/02.png";
 import servicesIcon3 from "../../assets/images/services-icon/03.png";
 import servicesIcon4 from "../../assets/images/services-icon/04.png";
+import { jwtDecode } from 'jwt-decode';
 
 
 
@@ -33,17 +34,18 @@ const Dashboard = props => {
     setMenu(!menu);
   };
   const [stats, setStats] = useState(null);
-  const [activities, setActivities] = useState([]);
+  
 
 useEffect(() => {
   const token = localStorage.getItem("token")
+  const user_id = jwtDecode(token)._id
   const fetchData = async () => {
     try {
-      const resStats = await axios.get('http://localhost:3005/dashboard/stats',{headers : {token}});
-      const resActivities = await axios.get('http://localhost:3005/dashboard',{headers : {token}});
+      const resStats = await axios.get(`http://localhost:3005/dashboard/${user_id}`,{headers : {token}});
+
 
       setStats(resStats.data);
-      setActivities(resActivities.data);
+
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
     }
@@ -60,9 +62,9 @@ useEffect(() => {
           <div className="page-title-box">
             <Row className="align-items-center">
               <Col md={8}>
-                <h6 className="page-title">Dashboard</h6>
+                <h6 className="page-title">Home</h6>
                 <ol className="breadcrumb m-0">
-                  <li className="breadcrumb-item active">Welcome to Assurify Dashboard</li>
+                  {/* <li className="breadcrumb-item active">Welcome to Assurify Dashboard</li> */}
                 </ol>
               </Col>
 
@@ -76,20 +78,20 @@ useEffect(() => {
           <Row>
             {stats && (
               <>
-            <Col xl={3} md={6}>
+            <Col xl={5} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
                   <div className="mb-4">
                     <div className="float-start mini-stat-img me-4">
                       <img src={servicesIcon1} alt="" />
                     </div>
-                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">Sessions</h5>
-                    <h4 className="fw-medium font-size-24">{stats.sessions}</h4>
+                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">Your Assigned Sessions</h5>
+                    <h4 className="fw-medium font-size-24">{stats.yourSessions}</h4>
                   </div>
                 </CardBody>
               </Card>
             </Col>
-            <Col xl={3} md={6}>
+            <Col xl={5} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
                   <div className="mb-4">
@@ -102,28 +104,28 @@ useEffect(() => {
                 </CardBody>
               </Card>
             </Col>
-            <Col xl={3} md={6}>
+            <Col xl={5} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
                   <div className="mb-4">
                     <div className="float-start mini-stat-img me-4">
                       <img src={servicesIcon3} alt="" />
                     </div>
-                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">Tutor Reports</h5>
-                    <h4 className="fw-medium font-size-24">{stats.tutorReports}</h4>
+                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">Tutor assigned to you</h5>
+                    <h4 className="fw-medium font-size-24">{stats.tutors}</h4>
                   </div>
                 </CardBody>
               </Card>
             </Col>
-            <Col xl={3} md={6}>
+            <Col xl={5} md={6}>
               <Card className="mini-stat bg-primary text-white">
                 <CardBody>
                   <div className="mb-4">
                     <div className="float-start mini-stat-img me-4">
                       <img src={servicesIcon4} alt="" />
                     </div>
-                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">Quality Members</h5>
-                    <h4 className="fw-medium font-size-24">{stats.qualityMembers}</h4>
+                    <h5 className="font-size-16 text-uppercase mt-0 text-white-50">Quality</h5>
+                    <h4 className="fw-medium font-size-24">{stats.quality}%</h4>
                   </div>
                 </CardBody>
               </Card>
@@ -133,7 +135,7 @@ useEffect(() => {
           </Row>
 
           <Row>
-            <Col xl={10}>
+            {/* <Col xl={10}>
               <Card>
                 <CardBody>
                   <h4 className="card-title mb-4">Activity</h4>
@@ -151,7 +153,7 @@ useEffect(() => {
                   
                 </CardBody>
               </Card>
-            </Col>
+            </Col> */}
 
             <Col xl={5}>
 

@@ -42,12 +42,6 @@ const AddPdf = () => {
         .then((res) => setCourses(res.data.courses || []))
         .catch((err) => console.error("Error fetching courses:", err));
 
-        // Fetch lessons
-        axios.get("http://localhost:3005/lessons", {
-        headers: { token },
-        })
-        .then((res) => setLessons(res.data.lessons || []))
-        .catch((err) => console.error("Error fetching lessons:", err));
 
         // If editing an existing PDF record
         if (pdfId) {
@@ -62,6 +56,14 @@ const AddPdf = () => {
                 lesson_id: res.data.pdf.lesson_id,
                 file: null, // file can't be pre-filled
                 });
+
+                axios.get(`http://localhost:3005/course/lesson/${res.data.pdf.course_id}`, {
+                headers: { token },
+                })
+                .then((res) => setLessons(res.data.lessons || []))
+                .catch((err) => console.error("Error fetching lessons:", err));
+
+
             } else {
                 console.error("Error fetching PDF:", res.data.message);
             }
@@ -115,14 +117,39 @@ const AddPdf = () => {
         }
     };
 
-    const handleSelectChange = (selectedOption, actionMeta) => {
-        const { name } = actionMeta;
-        setFormData((prev) => ({
-          ...prev,
-          [name]: selectedOption ? selectedOption.value : "",
-        }));
-      };
-      
+    const handleSelectChange = async (selectedOption, actionMeta) => {
+    const { name } = actionMeta;
+    const value = selectedOption ? selectedOption.value : "";
+
+    setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        ...(name === "course_id" ? { lesson_id: "" } : {}) // reset lesson if course changes
+    }));
+
+    if (name === "course_id" && value) {
+        const token = localStorage.getItem("token");
+        try {
+        const res = await axios.get(`http://localhost:3005/course/lesson/${value}`, {
+            headers: { token },
+        });
+        if (res.data.success) {
+            setLessons(res.data.lessons);
+        } else {
+            toast.error("Failed to load lessons for selected course.");
+        }
+        } catch (err) {
+        console.error("Error fetching lessons:", err);
+        toast.error("Error fetching lessons.");
+        }
+    }
+
+    // Optionally, clear lessons if course is cleared
+    if (name === "course_id" && !value) {
+        setLessons([]);
+    }
+    };
+
 
     document.title = editMode
         ? "Edit PDF | React Admin Dashboard"
@@ -161,12 +188,12 @@ return (
                     <Select
                         name="lesson_id"
                         value={lessons.find((l) => l._id === formData.lesson_id)
-                            ? { value: formData.lesson_id, label: lessons.find((l) => l._id === formData.lesson_id)?.title }
+                            ? { value: formData.lesson_id, label: lessons.find((l) => l._id === formData.lesson_id)?.lesson }
                             : null}
                         onChange={handleSelectChange}
                         options={lessons.map((lesson) => ({
                             value: lesson._id,
-                            label: lesson.title,
+                            label: lesson.lesson,
                         }))}
                         isClearable
                     />
