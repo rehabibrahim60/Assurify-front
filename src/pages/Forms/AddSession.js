@@ -178,10 +178,14 @@ const handleSubmit = async (e) => {
 
   if (formData.pdfOption === "upload") {
     try {
+      const selectedCourse = courses.find((c) => c._id === formData.course_id);
+      const selectedLesson = lessons.find((l) => l._id === formData.lesson_id);
+      const dynamicTitle = `${selectedCourse?.title || "Unknown Course"} /lesson ${selectedLesson?.lesson || "Unknown Lesson"}`;
       const pdfData = new FormData();
       pdfData.append("file", formData.file);
       pdfData.append("course_id", formData.course_id);
       pdfData.append("lesson_id", formData.lesson_id);
+      pdfData.append("pdfTitle", dynamicTitle);
       const pdfRes = await axios.post("http://localhost:3005/pdf", pdfData, {
         headers: { token },
       });
@@ -274,7 +278,7 @@ const handleSubmit = async (e) => {
   // controlled value: find current selected tutor option
   const selectedTutor = tutorOptions.find(opt => opt.value === formData.tutor) || null;
 
-  const pdfOptions = pdfs.map(pdf => ({ label: pdf.title, value: pdf._id }));
+  const pdfOptions = pdfs.map(pdf => ({ label: pdf.pdfTitle, value: pdf._id }));
   const selectedPdf = pdfOptions.find(opt => opt.value === formData.pdf) || null;
   // Assuming qms is an array like: [{ _id: '1', name: 'QM Name' }, ...]
   const qmOptions = qms.map(qm => ({ label: qm.name, value: qm._id }));
@@ -335,7 +339,7 @@ const handleSubmit = async (e) => {
                         />
                       ) : (
                         <>
-                          <Input
+                          {/* <Input
                             type="text"
                             id="pdfTitle"
                             placeholder="Enter PDF Title"
@@ -343,7 +347,7 @@ const handleSubmit = async (e) => {
                             onChange={handleChange}
                             className="mt-2"
                             required
-                          />
+                          /> */}
                           <Select
                             options={courses.map(c => ({ label: c.title, value: c._id }))}
                             onChange={(selected) => setFormData(prev => ({ ...prev, course_id: selected?.value || "" }))}

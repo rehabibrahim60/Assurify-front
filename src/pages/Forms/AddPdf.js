@@ -21,11 +21,13 @@ const AddPdf = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const pdfId = queryParams.get("id");
+    const basePath = location.pathname.startsWith("/admin") ? "/admin" : "/qm";
 
     const [formData, setFormData] = useState({
         course_id: "",
         lesson_id: "",
         file: null,
+        pdfTitle : ""
     });
 
     const [courses, setCourses] = useState([]);
@@ -85,9 +87,13 @@ const AddPdf = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const token = localStorage.getItem("token");
+        const selectedCourse = courses.find((c) => c._id === formData.course_id);
+        const selectedLesson = lessons.find((l) => l._id === formData.lesson_id);
+        const dynamicTitle = `${selectedCourse?.title || "Unknown Course"} /lesson ${selectedLesson?.lesson || "Unknown Lesson"}`;
         const form = new FormData();
         form.append("course_id", formData.course_id);
         form.append("lesson_id", formData.lesson_id);
+        form.append("pdfTitle", dynamicTitle);
         if (formData.file) form.append("file", formData.file);
 
         const method = editMode ? "patch" : "post";
@@ -108,7 +114,7 @@ const AddPdf = () => {
 
         if (response.data.success) {
             toast.success(editMode ? "PDF updated successfully!" : "PDF uploaded successfully!");
-            navigate("/admin/pdf"); // Or adjust route as needed
+            navigate(`${basePath}/pdf`); // Or adjust route as needed
         } else {
             toast.error("Error: " + response.data.message);
         }

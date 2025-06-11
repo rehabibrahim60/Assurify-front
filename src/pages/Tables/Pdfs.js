@@ -103,7 +103,7 @@ const PDFs = () => {
       },
       {
         header: "Lesson",
-        accessorKey: "lesson",
+        accessorKey: "lesson_id.lesson",
       },
       {
         header: "Actions",
