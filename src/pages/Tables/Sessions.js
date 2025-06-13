@@ -208,10 +208,10 @@ const Sessions = () => {
           isPagination={true}
           SearchPlaceholder="Search Sessions..."
           onSearch={handleSearch}
-          paginationClassName="pagination"
+          pagination="pagination"
           paginationWrapper="dataTables_paginate paging_simple_numbers"
           tableClass="table-bordered table-nowrap dt-responsive nowrap w-100 dataTable no-footer dtr-inline"
-          isCustomPageSize={true}
+
         />
 
         {/* Confirm Delete Modal */}

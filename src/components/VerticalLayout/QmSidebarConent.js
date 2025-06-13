@@ -186,9 +186,9 @@ const QmSidebarContent = props => {
                   <Link to="/qm/tutorFlag">{props.t("Tutor Flags ")}</Link>
                 </li>
                 
-                {/* <li>
+                <li>
                   <Link to="/qm/addTutorFlag">{props.t("Add Tutor Flag")}</Link>
-                </li> */}
+                </li>
               </ul>
             </li>
 

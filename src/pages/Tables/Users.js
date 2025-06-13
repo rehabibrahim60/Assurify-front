@@ -30,7 +30,7 @@ const handleDeleteConfirmed = async () => {
 
     if (data.success) {
       toast.success("User deleted successfully!");
-      setUsers((prev) => prev.filter((user) => user.id_by_organization !== userToDelete));
+      setUsers((prev) => prev.filter((user) => user._id !== userToDelete));
     } else {
       toast.error(`Error: ${data.message}`);
     }

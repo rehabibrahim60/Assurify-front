@@ -91,10 +91,10 @@ const basePath = location.pathname.startsWith("/admin") ? "/admin" : "/qm";
               {/*TO DO : go to admin or qm after backend connection*/ }
               <Link to={basePath} className="logo logo-light">
                 <span className="logo-sm">
-                  <img src={logo3} alt="" height="48%" width="60%"/>
+                  <img src={logo3} alt="" height="10%" width="20%"/>
                 </span>
                 <span className="logo-lg">
-                  <img src={logo3} alt="" height="35%" width="55%"/>
+                  <img src={logo3} alt="" height="25%" width="40%"/>
                 </span>
               </Link>
             </div>

@@ -105,7 +105,7 @@ const ReportTemp = () => {
                         </div>
                         <div className="text-end">
                           <h5 className="mb-1 text-white">Session ID</h5>
-                          <Badge color="light" className="font-size-12">#{report?.session_id}</Badge>
+                          <Badge color="light" className="font-size-12">Session Title: {report?.session_id?.title}</Badge>
                         </div>
                       </div>
                     </CardBody>

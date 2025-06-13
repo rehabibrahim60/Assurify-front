@@ -174,8 +174,9 @@ const UiVideo = () => {
         // You might want to add error handling here, like displaying an error message
       }
     } else {
+      const reportId = report._id
       // If report exists, navigate to the report page
-      const redirectPath = location.pathname.startsWith("/admin") ? "/admin/report-temp" : "/qm/report-temp";
+      const redirectPath = location.pathname.startsWith("/admin") ? `/admin/report-temp?id=${reportId}` : `/qm/report-temp?id=${reportId}`;
       navigate(redirectPath/*, { state: { session: fullReport } }*/);
     }
   };

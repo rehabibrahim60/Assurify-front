@@ -204,9 +204,9 @@ const SidebarContent = props => {
                 <li>
                   <Link to="/admin/addFlag">{props.t("Add Flag")}</Link>
                 </li>
-                {/* <li>
+                <li>
                   <Link to="/admin/addTutorFlag">{props.t("Add Tutor Flag")}</Link>
-                </li> */}
+                </li>
               </ul>
             </li>
 
